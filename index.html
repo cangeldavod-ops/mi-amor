@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Acceso privado 💜</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#0a0a0a,#1a001f);
+    font-family:'Segoe UI',sans-serif;
+    color:white;
+}
+
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:0;
+}
+
+.container,#message,#game,#heartScreen{
+    position:relative;
+    z-index:1;
+    background:rgba(255,255,255,0.05);
+    padding:40px;
+    border-radius:20px;
+    backdrop-filter:blur(12px);
+    box-shadow:0 0 40px rgba(128,0,128,0.4);
+    width:320px;
+    text-align:center;
+}
+
+input{
+    width:90%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:rgba(255,255,255,0.1);
+    color:white;
+}
+
+button{
+    margin-top:15px;
+    padding:10px 20px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(135deg,purple,violet);
+    color:white;
+    cursor:pointer;
+}
+
+#error{
+    margin-top:10px;
+    color:#ff8080;
+    white-space:pre-line;
+}
+
+.hidden{display:none;}
+
+.fade-in{animation:fadeIn .5s ease;}
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(20px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* corazón */
+#heartScreen h1{
+    font-size:80px;
+    animation:latido 1s infinite;
+    cursor:pointer;
+}
+@keyframes latido{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.2);}
+    100%{transform:scale(1);}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="container fade-in" id="login">
+    <h1>Acceso privado 💜</h1>
+    <p>Solo para Mi niña hermosa 💜</p>
+    <input type="password" id="password" placeholder="Contraseña...">
+    <br><br>
+    <button id="btnEntrar">Entrar</button>
+    <p id="error"></p>
+</div>
+
+<div id="message" class="hidden"></div>
+<div id="game" class="hidden"></div>
+<div id="heartScreen" class="hidden">
+    <h1 id="bigHeart">💜</h1>
+    <p>haz click 😌</p>
+</div>
+
+<script>
+
+// 🌌 partículas
+let c=document.getElementById("stars");
+let ctx=c.getContext("2d");
+c.width=innerWidth;
+c.height=innerHeight;
+
+let stars=[];
+for(let i=0;i<100;i++){
+    stars.push({x:Math.random()*c.width,y:Math.random()*c.height,s:Math.random()*2});
+}
+
+function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle="purple";
+    stars.forEach(st=>{
+        ctx.beginPath();
+        ctx.arc(st.x,st.y,st.s,0,Math.PI*2);
+        ctx.fill();
+    });
+    requestAnimationFrame(draw);
+}
+draw();
+
+// sistema
+let intentos=0;
+let descubrimientos=[];
+
+function guardar(x){
+    if(!descubrimientos.includes(x)) descubrimientos.push(x);
+}
+
+function cambiar(a,b){
+    a.classList.add("hidden");
+    b.classList.remove("hidden");
+    b.classList.add("fade-in");
+}
+
+// botones seguros
+function agregarVolver(){
+    let b=document.getElementById("btnVolver");
+    if(b) b.addEventListener("click", back);
+}
+
+// login
+document.getElementById("btnEntrar").addEventListener("click",check);
+
+let pistas=[
+"💜 prueba algo que te digo siempre",
+"😏 un apodo tuyo...",
+"💭 una fecha...",
+"😂 algo raro...",
+"✨ algo solo nuestro"
+];
+
+function check(){
+let p=document.getElementById("password").value.toLowerCase();
+let e=document.getElementById("error");
+
+intentos++;
+e.innerText="";
+
+if(p==="mi niña"){
+guardar("apodo"); fx();
+show("Hola mi niña hermosa 💜… sabía que ibas a entrar 😌");
+}
+
+else if(p==="1410"){
+guardar("fecha"); fx();
+show("Ese día… algo cambió 💜 y desde ahí todo contigo es diferente");
+}
+
+else if(p==="frijolesychocolate"){
+guardar("chiste"); fx();
+show("JAJAJA 😂💜 contigo todo siempre es mejor");
+}
+
+else if(p==="sai"){
+guardar("sai"); fx();
+show("Sai… suena tan especial como tú 💜");
+}
+
+else if(p==="chaifoca"){
+guardar("chaifoca"); fx();
+show("Chaifoca 😂💜 eres única");
+}
+
+else if(p==="te extraño"){
+guardar("emocion"); fx();
+show("Yo también… más de lo que imaginas 💜");
+}
+
+else if(p==="recuerdas"){
+guardar("juego");
+game();
+}
+
+else if(p==="nuestrodia"){
+if(descubrimientos.includes("fecha")){
+fx(); show("Ese día marcó todo 💜");
+}else{
+e.innerText="❌ aún no estás lista 😏";
+}
+}
+
+else if(p==="final"){
+if(descubrimientos.length>=4){
+final();
+}else{
+e.innerText="💜 explora un poco más...";
+}
+}
+
+else if(p==="te amo"){
+heart();
+}
+
+else{
+hack();
+let pista=pistas[Math.floor(Math.random()*pistas.length)];
+e.innerText="❌\n"+pista;
+}
+}
+
+// 💜 corazón
+function heart(){
+let login=document.getElementById("login");
+let heart=document.getElementById("heartScreen");
+
+cambiar(login,heart);
+
+document.getElementById("bigHeart").onclick=()=>{
+document.body.style.background="linear-gradient(135deg,#1a001f,#3a0050)";
+fx();
+show("Yo más 💜… muchísimo más 😌");
+};
+}
+
+// ✨ texto progresivo
+function show(t){
+let m=document.getElementById("message");
+
+m.innerHTML="<h2 id='texto'></h2><button id='btnVolver'>Volver</button>";
+cambiar(login,m);
+agregarVolver();
+
+let i=0;
+let textoElemento=document.getElementById("texto");
+
+let interval=setInterval(()=>{
+textoElemento.innerHTML += t[i];
+i++;
+if(i>=t.length) clearInterval(interval);
+},30);
+}
+
+// 🎮 minijuego
+function game(){
+let g=document.getElementById("game");
+
+g.innerHTML=`
+<h2>💜 pequeño recuerdo...</h2>
+<p>¿Qué fue lo que más me hizo enamorarme de ti?</p>
+
+<button id="op1">Tu sonrisa 😌</button><br><br>
+<button id="op2">Tu forma de ser 💜</button><br><br>
+<button id="op3">Todo de ti ✨</button><br><br>
+
+<button id="btnVolver">Volver</button>
+`;
+
+cambiar(login,g);
+agregarVolver();
+
+document.getElementById("op1").addEventListener("click",()=>resp(1));
+document.getElementById("op2").addEventListener("click",()=>resp(2));
+document.getElementById("op3").addEventListener("click",()=>resp(3));
+}
+
+function resp(x){
+let g=document.getElementById("game");
+
+let textos=[
+`<h2>😌 tu sonrisa...</h2>
+<p>fue lo primero que me hizo mirarte diferente 💜<br><br>pero no fue lo único...</p>`,
+
+`<h2>💜 tu forma de ser...</h2>
+<p>fue lo que me hizo quedarme 😌<br><br>porque eres tú… y eso vale mucho</p>`,
+
+`<h2>✨ todo de ti...</h2>
+<p>cada detalle tuyo hizo que poco a poco me enamorara 💜</p>`
+];
+
+g.innerHTML=textos[x-1]+`<br><button id="continuar">Continuar</button>`;
+document.getElementById("continuar").addEventListener("click",segundaParte);
+}
+
+function segundaParte(){
+let g=document.getElementById("game");
+
+g.innerHTML=`
+<h2>💜 la verdad...</h2>
+<p>
+no fue solo una cosa...<br><br>
+fue cómo me hiciste sentir 😌<br><br>
+sin darme cuenta te volviste alguien muy importante para mí<br><br>
+y ahora… no imagino mis días sin ti 💜
+</p>
+
+<button id="btnVolver">Volver</button>
+`;
+
+agregarVolver();
+}
+
+// 💀 final
+function final(){
+let m=document.getElementById("message");
+
+m.innerHTML=`
+<h2>💜 si llegaste hasta aquí…</h2>
+<p>
+significa que descubriste todo…<br><br>
+
+y quiero que sepas algo:<br><br>
+
+no importa la distancia,<br>
+no importa el tiempo,<br><br>
+
+yo te elijo a ti… hoy y siempre 😌💜
+</p>
+
+<button id="btnVolver">Volver</button>
+`;
+
+cambiar(login,m);
+agregarVolver();
+}
+
+// 🔙 FIX TOTAL
+function back(){
+document.getElementById("message").classList.add("hidden");
+document.getElementById("game").classList.add("hidden");
+document.getElementById("heartScreen").classList.add("hidden");
+
+document.getElementById("message").innerHTML="";
+document.getElementById("game").innerHTML="";
+
+let login=document.getElementById("login");
+login.classList.remove("hidden");
+
+document.getElementById("password").value="";
+document.getElementById("error").innerText="";
+}
+
+// efectos
+function fx(){
+for(let i=0;i<20;i++){
+let h=document.createElement("div");
+h.innerText="💜";
+h.style.position="fixed";
+h.style.left=Math.random()*100+"vw";
+h.style.top=Math.random()*100+"vh";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),1500);
+}
+}
+
+function hack(){
+let h=document.createElement("div");
+h.innerText="Acceso denegado...";
+h.style.position="fixed";
+h.style.top="0";
+h.style.color="lime";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),800);
+}
+
+</script>
+
+</body>
+</html>
